@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>se.conciliate</groupId>
+    <groupId>com.github.besherman</groupId>
     <artifactId>fingerprint-dir</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
@@ -27,7 +27,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>se.conciliate.fingerprint.Main</mainClass>
+                            <mainClass>com.github.besherman.fingerprint.Main</mainClass>
                         </manifest>                        
                     </archive>
                     <descriptorRefs>
@@ -59,10 +59,10 @@
                         <configuration>
                             <headerType>console</headerType>
                             <jar>${project.build.directory}/${artifactId}-${version}-jar-with-dependencies.jar</jar>
-                            <outfile>${project.build.directory}/${artifactId}.exe</outfile>
+                            <outfile>${project.build.directory}/fingd.exe</outfile>
                             <downloadUrl>http://java.com/download</downloadUrl>
                             <classPath>
-                                <mainClass>se.conciliate.fingerprint.Main</mainClass>
+                                <mainClass>com.github.besherman.fingerprint.Main</mainClass>
                                 <preCp>anything</preCp>
                             </classPath>
                             <!--<icon>application.ico</icon>-->
