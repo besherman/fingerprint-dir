@@ -8,10 +8,10 @@ package com.github.besherman.fingerprint;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.file.Files;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -55,20 +55,24 @@ public class Hashes {
     }    
 
     
+    private static final ThreadLocal<ByteBuffer> localBuffer = 
+            ThreadLocal.withInitial(() -> ByteBuffer.allocate(1024 * 1024));
+    
     /** Creates a SHA-1 hash of the file content. */
     public static String createRawHash(Path path, String alg) throws IOException {            
         try {
             MessageDigest digest = MessageDigest.getInstance(alg);
-//            RandomAccessFile file = new RandomAccessFile(path.toFile(), "r");
-//            MappedByteBuffer buff = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, Files.size(path));
+            RandomAccessFile file = new RandomAccessFile(path.toFile(), "r");
             
-            try(InputStream input = Files.newInputStream(path)) {
-                byte[] buff = new byte[512];
-                int read;
-                while((read = input.read(buff)) != -1) {
-                    digest.update(buff, 0, read);
-                } 
+            FileChannel channel = file.getChannel();            
+            ByteBuffer buff = localBuffer.get();            
+            
+            while(channel.read(buff) > -1) {
+                buff.flip();
+                digest.update(buff);
+                buff.clear();
             }
+            
             byte[] hash = digest.digest();
             StringBuilder sb = new StringBuilder(2*hash.length); 
             for(byte b : hash) { 
@@ -80,7 +84,6 @@ public class Hashes {
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
         }            
-    }
-    
+    }       
     
 }
