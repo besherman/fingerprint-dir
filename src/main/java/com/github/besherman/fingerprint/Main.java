@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
@@ -30,7 +32,7 @@ public class Main {
         Options options = new Options();
         
         options.addOption( OptionBuilder
-                                .withDescription("creates a map file for the directory")
+                                .withDescription("creates a fingerprint file for the directory")
                                 .hasArg()
                                 .withArgName("dir")
                                 .create('c'));
@@ -46,6 +48,12 @@ public class Main {
                                 .withArgName("fingerprint> <dir")
                                 .hasArgs(2)                                
                                 .create('t'));
+        
+        options.addOption( OptionBuilder
+                                .withDescription("shows duplicates in a directory")
+                                .withArgName("dir")
+                                .hasArgs(1)                                
+                                .create('u'));        
 
         options.addOption( OptionBuilder
                                 .withDescription("output to file")
@@ -118,6 +126,19 @@ public class Main {
             diff.print(System.out);
         } else if(cmd.hasOption('t')) {
             throw new RuntimeException("Not yet implemented");
+        } else if(cmd.hasOption('u')) {
+            Path root = Paths.get(cmd.getOptionValue('u'));
+            Fingerprint fp = new Fingerprint(root, "");
+            Map<String, FilePrint> map = new HashMap<>();
+            fp.stream().forEach(f -> {
+                if(map.containsKey(f.getHash())) {
+                    System.out.println("  " + map.get(f.getHash()).getPath());
+                    System.out.println("= " + f.getPath());
+                    System.out.println("");
+                } else {
+                    map.put(f.getHash(), f);
+                }
+            });
         } else {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("fingd", options, true);            
